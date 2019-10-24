@@ -1,5 +1,7 @@
 package io.dcvz.rnzendesk;
 
+import android.content.Intent;
+
 import zendesk.core.Zendesk;
 import zendesk.core.Identity;
 import zendesk.core.JwtIdentity;
