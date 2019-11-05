@@ -1,7 +1,10 @@
 package io.dcvz.rnzendesk;
 
 import android.content.Intent;
+import android.os.Build;
+import androidx.annotation.RequiresApi;
 
+import zendesk.commonui.UiConfig;
 import zendesk.core.Zendesk;
 import zendesk.core.Identity;
 import zendesk.core.JwtIdentity;
@@ -17,6 +20,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class RNZendeskBridge extends ReactContextBaseJavaModule {
 
@@ -31,12 +35,12 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
 
     // MARK: - Initialization
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @ReactMethod
     public void initialize(ReadableMap config) {
         String appId = config.getString("appId");
         String zendeskUrl = config.getString("zendeskUrl");
         String clientId = config.getString("clientId");
-
         Zendesk.INSTANCE.init(getReactApplicationContext(), zendeskUrl, appId, clientId);
         Support.INSTANCE.init(Zendesk.INSTANCE);
     }
@@ -63,19 +67,29 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void showHelpCenter(ReadableMap options) {
-        Boolean hideContact = options.getBoolean("hideContactUs") || false;
-        HelpCenterActivity.builder()
-            .withContactUsButtonVisible(!hideContact)
-            .show(getReactApplicationContext());
+//        Boolean hideContact = options.getBoolean("hideContactUs") || false;
+        UiConfig hcConfig = HelpCenterActivity.builder()
+                .withContactUsButtonVisible(!(options.hasKey("hideContactSupport") && options.getBoolean("hideContactSupport")))
+                .config();
+
+        Intent intent = HelpCenterActivity.builder()
+                .withContactUsButtonVisible(true)
+                .intent(getReactApplicationContext(), hcConfig);
+
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getReactApplicationContext().startActivity(intent);
     }
     
     @ReactMethod
     public void showNewTicket(ReadableMap options) {
         ArrayList tags = options.getArray("tags").toArrayList();
 
-        RequestActivity.builder()
-            .withTags(tags)
-            .show(getReactApplicationContext());
+        Intent intent = RequestActivity.builder()
+                .withTags(tags)
+                .intent(getReactApplicationContext());
+
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getReactApplicationContext().startActivity(intent);
     }
 
     @ReactMethod
