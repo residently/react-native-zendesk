@@ -24,10 +24,13 @@ export function identifyAnonymous(name?: string, email?: string) {
   RNZendesk.identifyAnonymous(name, email)
 }
 
-export function registerWithDeviceIdentifier(deviceIdentifier: string, callback: (result: string) => void) {
-  RNZendesk.registerWithDeviceIdentifier(deviceIdentifier, callback)
+export function registerWithDeviceIdentifier(deviceIdentifier: string, successCallback: (result: string) => void, errorCallback?: (result: string) => void) {
+  RNZendesk.registerWithDeviceIdentifier(deviceIdentifier, successCallback, errorCallback)
 }
 
+export function showTicket(requestId: string) {
+  RNZendesk.showTicket(requestId)
+}
 // MARK: - UI Methods
 
 interface HelpCenterOptions {

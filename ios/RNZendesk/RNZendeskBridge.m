@@ -20,6 +20,10 @@ RCT_EXTERN_METHOD(initialize:(NSDictionary *)config);
 RCT_EXTERN_METHOD(identifyJWT:(NSString *)token);
 RCT_EXTERN_METHOD(identifyAnonymous:(NSString *)name email:(NSString *)email);
 
+// MARK: - Notifications
+
+RCT_EXTERN_METHOD(registerWithDeviceIdentifier:(NSString *)deviceIdentifier successCallback:(RCTResponseSenderBlock)successCallback errorCallback:(RCTResponseSenderBlock)errorCallback);
+
 // MARK: - UI Methods
 
 RCT_EXTERN_METHOD(showHelpCenter:(NSDictionary *)options);
