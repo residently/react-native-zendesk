@@ -58,6 +58,22 @@ class RNZendesk: RCTEventEmitter {
         Zendesk.instance?.setIdentity(identity)
     }
     
+    // MARK: - Notifications
+
+    @objc(registerWithDeviceIdentifier:successCallback:errorCallback:)
+    func registerWithDeviceIdentifier(deviceIdentifier: String, successCallback: @escaping RCTResponseSenderBlock, errorCallback: @escaping RCTResponseSenderBlock) {
+        let locale = NSLocale.preferredLanguages.first ?? "en"
+        ZDKPushProvider(zendesk: Zendesk.instance!).register(deviceIdentifier: deviceIdentifier, locale: locale) { (pushResponse, error) in
+            if(error != nil) {
+                errorCallback(["\(error)"])
+            } else {
+                successCallback([pushResponse])
+            }
+        }
+    }
+   
+    
+
     // MARK: - UI Methods
     
     @objc(showHelpCenter:)

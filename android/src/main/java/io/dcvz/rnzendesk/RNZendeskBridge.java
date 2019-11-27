@@ -9,15 +9,22 @@ import zendesk.core.Zendesk;
 import zendesk.core.Identity;
 import zendesk.core.JwtIdentity;
 import zendesk.core.AnonymousIdentity;
+import zendesk.core.PushRegistrationProvider;
 import zendesk.support.Support;
 import zendesk.support.guide.HelpCenterActivity;
 import zendesk.support.request.RequestActivity;
 import zendesk.support.requestlist.RequestListActivity;
+import zendesk.support.request.RequestUiConfig;
+import com.zendesk.service.ErrorResponse;
+import com.zendesk.service.ZendeskCallback;
 
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.Callback;
+
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -61,6 +68,32 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
             .build();
 
         Zendesk.INSTANCE.setIdentity(identity);
+    }
+
+    @ReactMethod
+    public void registerWithDeviceIdentifier(String deviceIdentifier, Callback successCallback, Callback errorCallback) {
+        final Callback _successCallback = successCallback;
+        final Callback _errorCallback = errorCallback;
+
+        Zendesk.INSTANCE.provider().pushRegistrationProvider().registerWithDeviceIdentifier(deviceIdentifier, new ZendeskCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                _successCallback.invoke(result);
+            }
+
+            @Override
+            public void onError(ErrorResponse errorResponse) {
+                _errorCallback.invoke(errorResponse.getReason());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void showTicket(String requestId) {
+        final Intent deepLinkIntent = new RequestUiConfig.Builder()
+            .withRequestId(requestId)
+            .deepLinkIntent(getReactApplicationContext());
+        getReactApplicationContext().sendBroadcast(deepLinkIntent);
     }
 
     // MARK: - UI Methods
