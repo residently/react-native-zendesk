@@ -65,9 +65,9 @@ class RNZendesk: RCTEventEmitter {
         let locale = NSLocale.preferredLanguages.first ?? "en"
         ZDKPushProvider(zendesk: Zendesk.instance!).register(deviceIdentifier: deviceIdentifier, locale: locale) { (pushResponse, error) in
             if(error != nil) {
-                successCallback(["nay"])
+                errorCallback(["\(error)"])
             } else {
-                successCallback(["yay"])
+                successCallback([pushResponse])
             }
         }
     }
