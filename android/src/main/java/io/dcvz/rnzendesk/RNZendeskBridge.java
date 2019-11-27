@@ -84,7 +84,7 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
 
             @Override
             public void onError(ErrorResponse errorResponse) {
-                _errorCallback.invoke();
+                _errorCallback.invoke(errorResponse.getReason());
             }
         });
     }
