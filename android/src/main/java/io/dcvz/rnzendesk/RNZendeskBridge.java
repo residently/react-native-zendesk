@@ -70,6 +70,8 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
         Zendesk.INSTANCE.setIdentity(identity);
     }
 
+    // MARK: - Notifications
+
     @ReactMethod
     public void registerWithDeviceIdentifier(String deviceIdentifier, Callback successCallback, Callback errorCallback) {
         final Callback _successCallback = successCallback;
@@ -84,6 +86,19 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
             @Override
             public void onError(ErrorResponse errorResponse) {
                 _errorCallback.invoke(errorResponse.getReason());
+            }
+        });
+    }
+
+    @ReactMethod
+    public void unregisterDevice() {
+        Zendesk.INSTANCE.provider().pushRegistrationProvider().unregisterDevice(new ZendeskCallback<Void>() {
+            @Override
+            public void onSuccess(final Void response) {
+            }
+
+            @Override
+            public void onError(ErrorResponse errorResponse) {
             }
         });
     }

@@ -23,6 +23,7 @@ RCT_EXTERN_METHOD(identifyAnonymous:(NSString *)name email:(NSString *)email);
 // MARK: - Notifications
 
 RCT_EXTERN_METHOD(registerWithDeviceIdentifier:(NSString *)deviceIdentifier successCallback:(RCTResponseSenderBlock)successCallback errorCallback:(RCTResponseSenderBlock)errorCallback);
+RCT_EXTERN_METHOD(unregisterDevice);
 
 // MARK: - UI Methods
 

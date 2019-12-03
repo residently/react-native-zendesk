@@ -70,9 +70,12 @@ class RNZendesk: RCTEventEmitter {
                 successCallback([pushResponse])
             }
         }
+    }    
+
+    @objc(unregisterDevice)
+    func unregisterDevice() {
+        ZDKPushProvider(zendesk: Zendesk.instance!).unregisterForPush()
     }
-   
-    
 
     // MARK: - UI Methods
     
