@@ -24,8 +24,15 @@ export function identifyAnonymous(name?: string, email?: string) {
   RNZendesk.identifyAnonymous(name, email)
 }
 
+
+// MARK: - Notifications
+
 export function registerWithDeviceIdentifier(deviceIdentifier: string, successCallback: (result: string) => void, errorCallback?: (result: string) => void) {
   RNZendesk.registerWithDeviceIdentifier(deviceIdentifier, successCallback, errorCallback)
+}
+
+export function unregisterDevice() {
+  RNZendesk.unregisterDevice()
 }
 
 export function showTicket(requestId: string) {
