@@ -132,6 +132,11 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void refreshTicket(String requestId) {
+        Support.INSTANCE.refreshRequest(requestId, getReactApplicationContext());
+    }
+
+    @ReactMethod
     public void showNewTicket(ReadableMap options) {
         ArrayList tags = options.getArray("tags").toArrayList();
 

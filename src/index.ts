@@ -35,9 +35,6 @@ export function unregisterDevice() {
   RNZendesk.unregisterDevice()
 }
 
-export function showTicket(requestId: string) {
-  RNZendesk.showTicket(requestId)
-}
 // MARK: - UI Methods
 
 interface HelpCenterOptions {
@@ -50,6 +47,14 @@ export function showHelpCenter(options: HelpCenterOptions) {
 
 interface NewTicketOptions {
   tags?: string[]
+}
+
+export function showTicket(requestId: string) {
+  RNZendesk.showTicket(requestId)
+}
+
+export function refreshTicket(requestId: string) {
+  RNZendesk.refreshTicket(requestId)
 }
 
 export function showNewTicket(options: NewTicketOptions) {
