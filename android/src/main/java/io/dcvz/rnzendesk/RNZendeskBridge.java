@@ -103,13 +103,6 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
         });
     }
 
-    @ReactMethod
-    public void showTicket(String requestId) {
-        final Intent deepLinkIntent = new RequestUiConfig.Builder()
-            .withRequestId(requestId)
-            .deepLinkIntent(getReactApplicationContext());
-        getReactApplicationContext().sendBroadcast(deepLinkIntent);
-    }
 
     // MARK: - UI Methods
 
@@ -128,6 +121,21 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
         getReactApplicationContext().startActivity(intent);
     }
     
+    @ReactMethod
+    public void showTicket(String requestId) {
+        final Intent intent = new RequestUiConfig.Builder()
+            .withRequestId(requestId)
+            .intent(getReactApplicationContext());
+
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getReactApplicationContext().startActivity(intent);
+    }
+
+    @ReactMethod
+    public void refreshTicket(String requestId) {
+        Support.INSTANCE.refreshRequest(requestId, getReactApplicationContext());
+    }
+
     @ReactMethod
     public void showNewTicket(ReadableMap options) {
         ArrayList tags = options.getArray("tags").toArrayList();

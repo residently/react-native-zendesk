@@ -29,6 +29,8 @@ RCT_EXTERN_METHOD(unregisterDevice);
 
 RCT_EXTERN_METHOD(showHelpCenter:(NSDictionary *)options);
 RCT_EXTERN_METHOD(showNewTicket:(NSDictionary *)options);
+RCT_EXTERN_METHOD(showTicket:(NSString *)requestId);
+RCT_EXTERN_METHOD(refreshTicket:(NSString *)requestId);
 RCT_EXTERN_METHOD(showTicketList);
 
 @end
