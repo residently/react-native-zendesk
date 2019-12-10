@@ -107,10 +107,20 @@ class RNZendesk: RCTEventEmitter {
 
     @objc(showTicket:)
     func showTicket(with requestId: String) {
+        if (Support.instance!.refreshRequest(requestId: requestId)) {
+          return
+        }
+        
         DispatchQueue.main.async {
             let requestScreen = RequestUi.buildRequestUi(requestId: requestId)
             let nvc = UINavigationController(rootViewController: requestScreen)
-            UIApplication.shared.keyWindow?.rootViewController?.present(nvc, animated: true, completion: nil)
+            if var topController = UIApplication.shared.keyWindow?.rootViewController {
+                while let presentedViewController = topController.presentedViewController {
+                    topController = presentedViewController
+                }
+
+                topController.present(nvc, animated: true, completion: nil)
+            }
         }
     }
 
