@@ -106,11 +106,7 @@ class RNZendesk: RCTEventEmitter {
     }
 
     @objc(showTicket:)
-    func showTicket(with requestId: String) {
-        if (Support.instance!.refreshRequest(requestId: requestId)) {
-          return
-        }
-        
+    func showTicket(with requestId: String) {        
         DispatchQueue.main.async {
             let requestScreen = RequestUi.buildRequestUi(requestId: requestId)
             let nvc = UINavigationController(rootViewController: requestScreen)
@@ -124,10 +120,11 @@ class RNZendesk: RCTEventEmitter {
         }
     }
 
-    @objc(refreshTicket:)
-    func refreshTicket(with requestId: String) {
+    @objc(refreshTicket:resultCallback:)
+    func refreshTicket(requestId: String, resultCallback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
-            Support.instance?.refreshRequest(requestId: requestId)
+            let ticketWasVisibleAndRefreshed = Support.instance?.refreshRequest(requestId: requestId)
+            resultCallback([ticketWasVisibleAndRefreshed])
         }
     }
 
