@@ -132,8 +132,9 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void refreshTicket(String requestId) {
-        Support.INSTANCE.refreshRequest(requestId, getReactApplicationContext());
+    public void refreshTicket(String requestId, Callback resultCallback) {
+        boolean ticketWasVisibleAndRefreshed = Support.INSTANCE.refreshRequest(requestId, getReactApplicationContext());
+        resultCallback.invoke(ticketWasVisibleAndRefreshed);
     }
 
     @ReactMethod

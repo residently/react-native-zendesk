@@ -53,8 +53,8 @@ export function showTicket(requestId: string) {
   RNZendesk.showTicket(requestId)
 }
 
-export function refreshTicket(requestId: string) {
-  RNZendesk.refreshTicket(requestId)
+export function refreshTicket(requestId: string, resultCallback = () => {}) {
+  RNZendesk.refreshTicket(requestId, resultCallback)
 }
 
 export function showNewTicket(options: NewTicketOptions) {
