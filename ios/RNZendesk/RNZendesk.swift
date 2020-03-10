@@ -139,26 +139,33 @@ class RNZendesk: RCTEventEmitter {
     }
 
     // MARK: - Ticket Methods
-    @objc(createTicket)
-    func createTicket() {
+    @objc(createTicket:)
+    func createTicket(with path: String) {
+        print("Hello i am printing some stuff")
         DispatchQueue.main.async {
             var request = ZDKCreateRequest()
             request.subject = "I created a ticket!"
             request.requestDescription = "Created with the Zendesk SDK"
-            self.uploadAttachment { (attachment) in
+            self.uploadAttachment(path: path) { (attachment) in
                 if let attachment = attachment {
                     request.attachments.append(attachment)
                 }                
                 ZDKRequestProvider().createRequest(request) { (result, error) in
                     var lol = "ok"
+                    if let result = result {
+                        print("Create ticket result received")
+                    }
+                    if let error = error {
+                        print("Error: ", error.localizedDescription)
+                    }
                 }
             }
 
         }
     }
 
-    func uploadAttachment(callback: @escaping (ZDKUploadResponse?) -> Void) {
-        var theProfileImageUrl = URL(string: "https://media.glassdoor.com/sql/2448325/residently-squarelogo-1568749666426.png")
+    func uploadAttachment(path: String, callback: @escaping (ZDKUploadResponse?) -> Void) {
+        var theProfileImageUrl = URL(string: path)
         do {
             let attachment = try Data(contentsOf: theProfileImageUrl!)
             // let attachment = try Data(contentsOf: theProfileImageUrl as! URL)
