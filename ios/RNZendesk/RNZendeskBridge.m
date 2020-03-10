@@ -33,4 +33,7 @@ RCT_EXTERN_METHOD(showTicket:(NSString *)requestId);
 RCT_EXTERN_METHOD(refreshTicket:(NSString *)requestId resultCallback:(RCTResponseSenderBlock)resultCallback);
 RCT_EXTERN_METHOD(showTicketList);
 
+// MARK: - Ticket Methods
+RCT_EXTERN_METHOD(createTicket)
+
 @end

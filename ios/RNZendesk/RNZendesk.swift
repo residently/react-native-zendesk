@@ -137,4 +137,43 @@ class RNZendesk: RCTEventEmitter {
             UIApplication.shared.keyWindow?.rootViewController?.present(nvc, animated: true)
         }
     }
+
+    // MARK: - Ticket Methods
+    @objc(createTicket)
+    func createTicket() {
+        DispatchQueue.main.async {
+            var request = ZDKCreateRequest()
+            request.subject = "I created a ticket!"
+            request.requestDescription = "Created with the Zendesk SDK"
+            self.uploadAttachment { (attachment) in
+                if let attachment = attachment {
+                    request.attachments.append(attachment)
+                }                
+                ZDKRequestProvider().createRequest(request) { (result, error) in
+                    var lol = "ok"
+                }
+            }
+
+        }
+    }
+
+    func uploadAttachment(callback: @escaping (ZDKUploadResponse?) -> Void) {
+        var theProfileImageUrl = URL(string: "https://media.glassdoor.com/sql/2448325/residently-squarelogo-1568749666426.png")
+        do {
+            let attachment = try Data(contentsOf: theProfileImageUrl!)
+            // let attachment = try Data(contentsOf: theProfileImageUrl as! URL)
+            ZDKUploadProvider().uploadAttachment(attachment, withFilename: "image_name_app.png", andContentType: "image") { (response, error) in
+                if let response = response {
+                    print("Token: ", response.uploadToken!)
+                    print("Attachment: ", response.attachment!)
+                }
+                if let error = error {
+                    print("Error: ", error.localizedDescription)
+                }
+                callback(response)  // response always gets sent regardless if nil.
+            }
+        } catch {
+            print("Unable to load data: \(error)")
+        }
+    }
 }

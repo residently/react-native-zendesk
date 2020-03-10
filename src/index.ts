@@ -64,3 +64,9 @@ export function showNewTicket(options: NewTicketOptions) {
 export function showTicketList() {
   RNZendesk.showTicketList()
 }
+
+// MARK: - Ticket Methods
+
+export function createTicket() {
+  RNZendesk.createTicket()
+}
