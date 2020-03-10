@@ -1,5 +1,11 @@
 package io.dcvz.rnzendesk;
 
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.lang.Exception;
+
 import android.content.Intent;
 import android.os.Build;
 import androidx.annotation.RequiresApi;
@@ -11,6 +17,11 @@ import zendesk.core.JwtIdentity;
 import zendesk.core.AnonymousIdentity;
 import zendesk.core.PushRegistrationProvider;
 import zendesk.support.Support;
+import zendesk.support.CreateRequest;
+import zendesk.support.UploadProvider;
+import zendesk.support.UploadResponse;
+import zendesk.support.Request;
+import zendesk.support.RequestProvider;
 import zendesk.support.guide.HelpCenterActivity;
 import zendesk.support.request.RequestActivity;
 import zendesk.support.requestlist.RequestListActivity;
@@ -156,5 +167,47 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
 
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getReactApplicationContext().startActivity(intent);
+    }
+
+    // MARK: - Ticket Methods
+    @ReactMethod
+    public void createTicket(String path) throws Exception {
+        final RequestProvider provider = Support.INSTANCE.provider().requestProvider();
+        final CreateRequest request = new CreateRequest();
+
+        request.setSubject("Ticket subject (Android)");
+        request.setDescription("Ticket description");
+
+        File fileToUpload = new File(new URL(path).toURI());
+        UploadProvider uploadProvider = Support.INSTANCE.provider().uploadProvider();
+
+
+        uploadProvider.uploadAttachment("screenshot.png", fileToUpload, "image/png",  new
+            ZendeskCallback<UploadResponse>() {
+                @Override
+                public void onSuccess(UploadResponse uploadResponse) {
+                    // Handle success
+                    List<String> attachmentsUploaded = new ArrayList<>();
+                    attachmentsUploaded.add(uploadResponse.getToken());
+                    request.setAttachments(attachmentsUploaded);
+                    provider.createRequest(request, new ZendeskCallback<Request>() {
+                        @Override
+                        public void onSuccess(Request createRequest) {
+                            // Handle the success
+                        }
+                        @Override
+                        public void onError(ErrorResponse errorResponse) {
+                            // Handle the error
+                            // Log the error
+                            // Logger.e("MyLogTag", errorResponse);
+                        }
+                    });
+                }
+
+                @Override
+                public void onError(ErrorResponse errorResponse) {
+                    // Handle error
+                }
+        });        
     }
 }

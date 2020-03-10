@@ -162,7 +162,8 @@ class RNZendesk: RCTEventEmitter {
         do {
             let attachment = try Data(contentsOf: theProfileImageUrl!)
             // let attachment = try Data(contentsOf: theProfileImageUrl as! URL)
-            ZDKUploadProvider().uploadAttachment(attachment, withFilename: "image_name_app.png", andContentType: "image") { (response, error) in
+            // TODO MIME TYPE
+            ZDKUploadProvider().uploadAttachment(attachment, withFilename: "image_name_app.png", andContentType: "image/png") { (response, error) in
                 if let response = response {
                     print("Token: ", response.uploadToken!)
                     print("Attachment: ", response.attachment!)
