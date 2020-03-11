@@ -68,5 +68,5 @@ export function showTicketList() {
 // MARK: - Ticket Methods
 
 export function createTicket(path: string) {
-  RNZendesk.createTicket(path)
+  return RNZendesk.createTicket(path)
 }

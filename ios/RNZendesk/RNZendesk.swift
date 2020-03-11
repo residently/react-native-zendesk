@@ -139,28 +139,40 @@ class RNZendesk: RCTEventEmitter {
     }
 
     // MARK: - Ticket Methods
-    @objc(createTicket:)
-    func createTicket(with path: String) {
+    @objc(createTicket:resolve:reject:)
+    func createTicket(with path: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         print("Hello i am printing some stuff")
         NSLog("hello this is a log")
         DispatchQueue.main.async {
             var request = ZDKCreateRequest()
             request.subject = "I created a ticket!"
             request.requestDescription = "Created with the Zendesk SDK"
-            self.uploadAttachment(path: path) { (attachment) in
-                if let attachment = attachment {
-                    request.attachments.append(attachment)
-                }                
-                ZDKRequestProvider().createRequest(request) { (result, error) in
-                    var lol = "ok"
-                    if let result = result {
-                        print("Create ticket result received")
-                    }
-                    if let error = error {
-                        print("Error: ", error.localizedDescription)
-                    }
+
+            ZDKRequestProvider().createRequest(request) { (result, error) in
+                var lol = "ok"
+                if let result = result {
+                    print("Create ticket result received")
+                    resolve("Create ticket result received")
+                }
+                if let error = error {
+                    print("Error: ", error.localizedDescription)
                 }
             }
+
+            // self.uploadAttachment(path: path) { (attachment) in
+            //     if let attachment = attachment {
+            //         request.attachments.append(attachment)
+            //     }                
+            //     ZDKRequestProvider().createRequest(request) { (result, error) in
+            //         var lol = "ok"
+            //         if let result = result {
+            //             print("Create ticket result received")
+            //         }
+            //         if let error = error {
+            //             print("Error: ", error.localizedDescription)
+            //         }
+            //     }
+            // }
 
         }
     }
