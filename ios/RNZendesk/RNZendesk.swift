@@ -142,6 +142,7 @@ class RNZendesk: RCTEventEmitter {
     @objc(createTicket:)
     func createTicket(with path: String) {
         print("Hello i am printing some stuff")
+        NSLog("hello this is a log")
         DispatchQueue.main.async {
             var request = ZDKCreateRequest()
             request.subject = "I created a ticket!"
@@ -165,10 +166,10 @@ class RNZendesk: RCTEventEmitter {
     }
 
     func uploadAttachment(path: String, callback: @escaping (ZDKUploadResponse?) -> Void) {
-        var theProfileImageUrl = URL(string: path)
+        print("uploadAttachment: " + path)
+        var theProfileImageUrl = URL(string: "file://" + path)
         do {
             let attachment = try Data(contentsOf: theProfileImageUrl!)
-            // let attachment = try Data(contentsOf: theProfileImageUrl as! URL)
             // TODO MIME TYPE
             ZDKUploadProvider().uploadAttachment(attachment, withFilename: "image_name_app.png", andContentType: "image/png") { (response, error) in
                 if let response = response {
