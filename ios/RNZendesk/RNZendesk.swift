@@ -147,6 +147,12 @@ class RNZendesk: RCTEventEmitter {
             var request = ZDKCreateRequest()
             request.subject = "I created a ticket!"
             request.requestDescription = "Created with the Zendesk SDK"
+            
+            // TODO Attachments from tokens
+            // var uploadResponse = ZDKUploadResponse()
+            // uploadResponse.uploadToken = response.uploadToken!
+            // request.attachments.append(uploadResponse)
+
 
             ZDKRequestProvider().createRequest(request) { (result, error) in
                 var lol = "ok"
@@ -177,21 +183,33 @@ class RNZendesk: RCTEventEmitter {
         }
     }
 
-    func uploadAttachment(path: String, callback: @escaping (ZDKUploadResponse?) -> Void) {
+    @objc(uploadAttachment:mimeType:fileName:resolve:reject:)
+    func uploadAttachment(path: String, mimeType: String, fileName: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         print("uploadAttachment: " + path)
         var theProfileImageUrl = URL(string: "file://" + path)
         do {
             let attachment = try Data(contentsOf: theProfileImageUrl!)
             // TODO MIME TYPE
-            ZDKUploadProvider().uploadAttachment(attachment, withFilename: "image_name_app.png", andContentType: "image/png") { (response, error) in
+            ZDKUploadProvider().uploadAttachment(attachment, withFilename: fileName, andContentType: mimeType) { (response, error) in
                 if let response = response {
                     print("Token: ", response.uploadToken!)
                     print("Attachment: ", response.attachment!)
+                    // resolve(response.attachment)
+                    var request = ZDKCreateRequest()
+                    request.subject = "I created a ticket!"
+                    request.requestDescription = "Created with the Zendesk SDK"
+                    var uploadResponse = ZDKUploadResponse()
+                    uploadResponse.uploadToken = response.uploadToken!
+                    request.attachments.append(uploadResponse)
+                    ZDKRequestProvider().createRequest(request) { (result, error) in 
+                        var lol = "ok"
+                    }
+                    resolve(response.uploadToken!)
                 }
                 if let error = error {
                     print("Error: ", error.localizedDescription)
+                    // reject(error.localizedDescription)
                 }
-                callback(response)  // response always gets sent regardless if nil.
             }
         } catch {
             print("Unable to load data: \(error)")

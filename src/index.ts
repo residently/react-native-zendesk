@@ -70,3 +70,7 @@ export function showTicketList() {
 export function createTicket(path: string) {
   return RNZendesk.createTicket(path)
 }
+
+export function uploadAttachment(path: string, mimeType: string, fileName: string) {
+  return RNZendesk.uploadAttachment(path, mimeType, fileName);
+}
