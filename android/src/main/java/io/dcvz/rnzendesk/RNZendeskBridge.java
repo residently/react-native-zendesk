@@ -171,43 +171,56 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
 
     // MARK: - Ticket Methods
     @ReactMethod
-    public void createTicket(String path) throws Exception {
+    public void createTicket(String path, final Promise promise) throws Exception {
         final RequestProvider provider = Support.INSTANCE.provider().requestProvider();
         final CreateRequest request = new CreateRequest();
 
         request.setSubject("Ticket subject (Android)");
         request.setDescription("Ticket description");
 
-        File fileToUpload = new File(new URL(path).toURI());
-        UploadProvider uploadProvider = Support.INSTANCE.provider().uploadProvider();
+        provider.createRequest(request, new ZendeskCallback<Request>() {
+            @Override
+            public void onSuccess(Request createRequest) {
+                // Handle the success
+                promise.resolve("Ticket done!");
+            }
+            @Override
+            public void onError(ErrorResponse errorResponse) {
+                // Handle the error
+                // Log the error
+                // Logger.e("MyLogTag", errorResponse);
+                promise.reject("Ticket creation failed");
+            }
+        });
 
+        // File fileToUpload = new File(new URL(path).toURI());
+        // UploadProvider uploadProvider = Support.INSTANCE.provider().uploadProvider();
+        // uploadProvider.uploadAttachment("screenshot.png", fileToUpload, "image/png",  new
+        //     ZendeskCallback<UploadResponse>() {
+        //         @Override
+        //         public void onSuccess(UploadResponse uploadResponse) {
+        //             // Handle success
+        //             List<String> attachmentsUploaded = new ArrayList<>();
+        //             attachmentsUploaded.add(uploadResponse.getToken());
+        //             request.setAttachments(attachmentsUploaded);
+        //             provider.createRequest(request, new ZendeskCallback<Request>() {
+        //                 @Override
+        //                 public void onSuccess(Request createRequest) {
+        //                     // Handle the success
+        //                 }
+        //                 @Override
+        //                 public void onError(ErrorResponse errorResponse) {
+        //                     // Handle the error
+        //                     // Log the error
+        //                     // Logger.e("MyLogTag", errorResponse);
+        //                 }
+        //             });
+        //         }
 
-        uploadProvider.uploadAttachment("screenshot.png", fileToUpload, "image/png",  new
-            ZendeskCallback<UploadResponse>() {
-                @Override
-                public void onSuccess(UploadResponse uploadResponse) {
-                    // Handle success
-                    List<String> attachmentsUploaded = new ArrayList<>();
-                    attachmentsUploaded.add(uploadResponse.getToken());
-                    request.setAttachments(attachmentsUploaded);
-                    provider.createRequest(request, new ZendeskCallback<Request>() {
-                        @Override
-                        public void onSuccess(Request createRequest) {
-                            // Handle the success
-                        }
-                        @Override
-                        public void onError(ErrorResponse errorResponse) {
-                            // Handle the error
-                            // Log the error
-                            // Logger.e("MyLogTag", errorResponse);
-                        }
-                    });
-                }
-
-                @Override
-                public void onError(ErrorResponse errorResponse) {
-                    // Handle error
-                }
-        });        
+        //         @Override
+        //         public void onError(ErrorResponse errorResponse) {
+        //             // Handle error
+        //         }
+        // });        
     }
 }
