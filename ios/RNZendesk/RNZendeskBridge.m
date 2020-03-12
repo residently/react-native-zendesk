@@ -34,7 +34,7 @@ RCT_EXTERN_METHOD(refreshTicket:(NSString *)requestId resultCallback:(RCTRespons
 RCT_EXTERN_METHOD(showTicketList);
 
 // MARK: - Ticket Methods
-RCT_EXTERN_METHOD(createTicket:(NSString *)subject desc:(NSString *)desc resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject);
+RCT_EXTERN_METHOD(createTicket:(NSString *)subject desc:(NSString *)desc attachments:(NSArray)attachments resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject);
 
 RCT_EXTERN_METHOD(uploadAttachment:(NSString *)path mimeType:(NSString *)mimeType fileName:(NSString *)file resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 

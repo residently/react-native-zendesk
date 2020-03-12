@@ -139,17 +139,18 @@ class RNZendesk: RCTEventEmitter {
     }
 
     // MARK: - Ticket Methods
-    @objc(createTicket:desc:resolve:reject:)
-    func createTicket(with subject: String, desc: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    @objc(createTicket:desc:attachments:resolve:reject:)
+    func createTicket(with subject: String, desc: String, attachments: Array<String>, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
             let request = ZDKCreateRequest()
             request.subject = subject
             request.requestDescription = desc
             
-            // TODO Attachments from tokens
-            // var uploadResponse = ZDKUploadResponse()
-            // uploadResponse.uploadToken = response.uploadToken!
-            // request.attachments.append(uploadResponse)
+            attachments.forEach { attachment in
+                var uploadResponse = ZDKUploadResponse()
+                uploadResponse.uploadToken = attachment
+                request.attachments.append(uploadResponse)
+            }
 
             ZDKRequestProvider().createRequest(request) { (result, error) in
                 // TODO resolve and reject in a meaningful way (iOS should match android on this)
@@ -168,6 +169,7 @@ class RNZendesk: RCTEventEmitter {
 
     @objc(uploadAttachment:mimeType:fileName:resolve:reject:)
     func uploadAttachment(path: String, mimeType: String, fileName: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        // TODO wrap in DispatchQueue.main.async
         let theProfileImageUrl = URL(string: "file://" + path)
         do {
             let attachment = try Data(contentsOf: theProfileImageUrl!)
@@ -184,6 +186,7 @@ class RNZendesk: RCTEventEmitter {
             }
         } catch {
             print("Unable to load data: \(error)")
+            // TODO reject
         }
     }
 }

@@ -67,8 +67,8 @@ export function showTicketList() {
 
 // MARK: - Ticket Methods
 
-export function createTicket(subject: string, desc: string) {
-  return RNZendesk.createTicket(subject, desc)
+export function createTicket(subject: string, desc: string, attachments: Array<String> = []) {
+  return RNZendesk.createTicket(subject, desc, attachments)
 }
 
 export function uploadAttachment(path: string, mimeType: string, fileName: string) {
