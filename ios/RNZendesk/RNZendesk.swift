@@ -139,12 +139,12 @@ class RNZendesk: RCTEventEmitter {
     }
 
     // MARK: - Ticket Methods
-    @objc(createTicket:resolve:reject:)
-    func createTicket(with path: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    @objc(createTicket:desc:resolve:reject:)
+    func createTicket(with subject: String, desc: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
             let request = ZDKCreateRequest()
-            request.subject = "I created a ticket!"
-            request.requestDescription = "Created with the Zendesk SDK"
+            request.subject = subject
+            request.requestDescription = desc
             
             // TODO Attachments from tokens
             // var uploadResponse = ZDKUploadResponse()
