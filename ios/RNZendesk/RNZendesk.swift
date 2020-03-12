@@ -141,10 +141,8 @@ class RNZendesk: RCTEventEmitter {
     // MARK: - Ticket Methods
     @objc(createTicket:resolve:reject:)
     func createTicket(with path: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-        print("Hello i am printing some stuff")
-        NSLog("hello this is a log")
         DispatchQueue.main.async {
-            var request = ZDKCreateRequest()
+            let request = ZDKCreateRequest()
             request.subject = "I created a ticket!"
             request.requestDescription = "Created with the Zendesk SDK"
             
@@ -153,62 +151,35 @@ class RNZendesk: RCTEventEmitter {
             // uploadResponse.uploadToken = response.uploadToken!
             // request.attachments.append(uploadResponse)
 
-
             ZDKRequestProvider().createRequest(request) { (result, error) in
-                var lol = "ok"
-                if let result = result {
-                    print("Create ticket result received")
+                // TODO resolve and reject in a meaningful way (iOS should match android on this)
+                // if let result = result {
+                if result != nil {
                     resolve("Create ticket result received")
-                }
-                if let error = error {
-                    print("Error: ", error.localizedDescription)
+                } else if let error = error {
+                    reject("zendesk_error", error.localizedDescription, error);
+                } else {
+                    let unKnownError = NSError(domain: "", code: 200, userInfo: nil)
+                    reject("unknown_error", "Unexpected error", unKnownError)
                 }
             }
-
-            // self.uploadAttachment(path: path) { (attachment) in
-            //     if let attachment = attachment {
-            //         request.attachments.append(attachment)
-            //     }                
-            //     ZDKRequestProvider().createRequest(request) { (result, error) in
-            //         var lol = "ok"
-            //         if let result = result {
-            //             print("Create ticket result received")
-            //         }
-            //         if let error = error {
-            //             print("Error: ", error.localizedDescription)
-            //         }
-            //     }
-            // }
-
         }
     }
 
     @objc(uploadAttachment:mimeType:fileName:resolve:reject:)
     func uploadAttachment(path: String, mimeType: String, fileName: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-        print("uploadAttachment: " + path)
-        var theProfileImageUrl = URL(string: "file://" + path)
+        let theProfileImageUrl = URL(string: "file://" + path)
         do {
             let attachment = try Data(contentsOf: theProfileImageUrl!)
-            // TODO MIME TYPE
             ZDKUploadProvider().uploadAttachment(attachment, withFilename: fileName, andContentType: mimeType) { (response, error) in
+                // TODO resolve and reject in a meaningful way (iOS should match android on this)
                 if let response = response {
-                    print("Token: ", response.uploadToken!)
-                    print("Attachment: ", response.attachment!)
-                    // resolve(response.attachment)
-                    var request = ZDKCreateRequest()
-                    request.subject = "I created a ticket!"
-                    request.requestDescription = "Created with the Zendesk SDK"
-                    var uploadResponse = ZDKUploadResponse()
-                    uploadResponse.uploadToken = response.uploadToken!
-                    request.attachments.append(uploadResponse)
-                    ZDKRequestProvider().createRequest(request) { (result, error) in 
-                        var lol = "ok"
-                    }
                     resolve(response.uploadToken!)
-                }
-                if let error = error {
-                    print("Error: ", error.localizedDescription)
-                    // reject(error.localizedDescription)
+                } else if let error = error {
+                    reject("zendesk_error", error.localizedDescription, error);
+                } else {
+                    let unKnownError = NSError(domain: "", code: 200, userInfo: nil)
+                    reject("unknown_error", "Unexpected error", unKnownError)
                 }
             }
         } catch {
