@@ -1,7 +1,8 @@
 package io.dcvz.rnzendesk;
 
 import java.io.File;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.lang.Exception;
@@ -31,6 +32,7 @@ import com.zendesk.service.ZendeskCallback;
 
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.Promise;
@@ -171,56 +173,52 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
 
     // MARK: - Ticket Methods
     @ReactMethod
-    public void createTicket(String path, final Promise promise) throws Exception {
+    public void createTicket(String subject, String desc, ReadableArray attachments, final Promise promise) {
         final RequestProvider provider = Support.INSTANCE.provider().requestProvider();
         final CreateRequest request = new CreateRequest();
 
-        request.setSubject("Ticket subject (Android)");
-        request.setDescription("Ticket description");
+        request.setSubject(subject);
+        request.setDescription(desc);
+
+        ArrayList<String> attachmentsUploaded = new ArrayList<String>();
+        for (int i = 0; i < attachments.size(); i++) {
+            attachmentsUploaded.add(attachments.getString(i));
+        }
+        request.setAttachments(attachmentsUploaded);
 
         provider.createRequest(request, new ZendeskCallback<Request>() {
             @Override
             public void onSuccess(Request createRequest) {
-                // Handle the success
                 promise.resolve("Ticket done!");
             }
             @Override
             public void onError(ErrorResponse errorResponse) {
-                // Handle the error
-                // Log the error
-                // Logger.e("MyLogTag", errorResponse);
                 promise.reject("Ticket creation failed");
             }
         });
+    }
 
-        // File fileToUpload = new File(new URL(path).toURI());
-        // UploadProvider uploadProvider = Support.INSTANCE.provider().uploadProvider();
-        // uploadProvider.uploadAttachment("screenshot.png", fileToUpload, "image/png",  new
-        //     ZendeskCallback<UploadResponse>() {
-        //         @Override
-        //         public void onSuccess(UploadResponse uploadResponse) {
-        //             // Handle success
-        //             List<String> attachmentsUploaded = new ArrayList<>();
-        //             attachmentsUploaded.add(uploadResponse.getToken());
-        //             request.setAttachments(attachmentsUploaded);
-        //             provider.createRequest(request, new ZendeskCallback<Request>() {
-        //                 @Override
-        //                 public void onSuccess(Request createRequest) {
-        //                     // Handle the success
-        //                 }
-        //                 @Override
-        //                 public void onError(ErrorResponse errorResponse) {
-        //                     // Handle the error
-        //                     // Log the error
-        //                     // Logger.e("MyLogTag", errorResponse);
-        //                 }
-        //             });
-        //         }
-
-        //         @Override
-        //         public void onError(ErrorResponse errorResponse) {
-        //             // Handle error
-        //         }
-        // });        
+    @ReactMethod
+    public void uploadAttachment(String path, String mimeType, String fileName, final Promise promise) {
+        try {
+            File fileToUpload = new File(new URI(path));    
+    
+            UploadProvider uploadProvider = Support.INSTANCE.provider().uploadProvider();
+            uploadProvider.uploadAttachment(fileName, fileToUpload, mimeType,  new
+                ZendeskCallback<UploadResponse>() {
+                    @Override
+                    public void onSuccess(UploadResponse uploadResponse) {
+                        promise.resolve(uploadResponse.getToken());
+                    }
+    
+                    @Override
+                    public void onError(ErrorResponse errorResponse) {
+                        promise.reject("Error uploading attachment");
+                    }
+                });      
+        } catch (URISyntaxException e) {
+            promise.reject("Error uploading attachment: invalid file path");
+        }
+  
     }
 }
