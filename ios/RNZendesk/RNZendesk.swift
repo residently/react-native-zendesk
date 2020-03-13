@@ -169,24 +169,25 @@ class RNZendesk: RCTEventEmitter {
 
     @objc(uploadAttachment:mimeType:fileName:resolve:reject:)
     func uploadAttachment(path: String, mimeType: String, fileName: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-        // TODO wrap in DispatchQueue.main.async
-        let theProfileImageUrl = URL(string: "file://" + path)
-        do {
-            let attachment = try Data(contentsOf: theProfileImageUrl!)
-            ZDKUploadProvider().uploadAttachment(attachment, withFilename: fileName, andContentType: mimeType) { (response, error) in
-                // TODO resolve and reject in a meaningful way (iOS should match android on this)
-                if let response = response {
-                    resolve(response.uploadToken!)
-                } else if let error = error {
-                    reject("zendesk_error", error.localizedDescription, error);
-                } else {
-                    let unKnownError = NSError(domain: "", code: 200, userInfo: nil)
-                    reject("unknown_error", "Unexpected error", unKnownError)
+        DispatchQueue.main.async {
+            let theProfileImageUrl = URL(string: "file://" + path)
+            do {
+                let attachment = try Data(contentsOf: theProfileImageUrl!)
+                ZDKUploadProvider().uploadAttachment(attachment, withFilename: fileName, andContentType: mimeType) { (response, error) in
+                    // TODO resolve and reject in a meaningful way (iOS should match android on this)
+                    if let response = response {
+                        resolve(response.uploadToken!)
+                    } else if let error = error {
+                        reject("zendesk_error", error.localizedDescription, error);
+                    } else {
+                        let unKnownError = NSError(domain: "", code: 200, userInfo: nil)
+                        reject("unexpected_error", "Unexpected error", unKnownError)
+                    }
                 }
+            } catch {
+                print("Unable to load data: \(error)")
+                reject("unknown_error", "Unknown error", error)
             }
-        } catch {
-            print("Unable to load data: \(error)")
-            // TODO reject
         }
     }
 }
