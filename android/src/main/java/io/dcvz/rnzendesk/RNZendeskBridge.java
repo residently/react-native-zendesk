@@ -173,7 +173,7 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
 
     // MARK: - Ticket Methods
     @ReactMethod
-    public void createTicket(String subject, String desc, ReadableArray attachments, final Promise promise) {
+    public void createTicket(String subject, String desc, ReadableArray tags, ReadableArray attachments, final Promise promise) {
         final RequestProvider provider = Support.INSTANCE.provider().requestProvider();
         final CreateRequest request = new CreateRequest();
 
@@ -185,6 +185,12 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
             attachmentsUploaded.add(attachments.getString(i));
         }
         request.setAttachments(attachmentsUploaded);
+        
+        ArrayList<String> tagsSelected = new ArrayList<String>();
+        for (int i = 0; i < tags.size(); i++) {
+            tagsSelected.add(tags.getString(i));
+        }
+        request.setTags(tagsSelected);
 
         provider.createRequest(request, new ZendeskCallback<Request>() {
             @Override
