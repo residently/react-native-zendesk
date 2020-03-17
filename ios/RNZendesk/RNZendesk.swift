@@ -139,12 +139,13 @@ class RNZendesk: RCTEventEmitter {
     }
 
     // MARK: - Ticket Methods
-    @objc(createTicket:desc:attachments:resolve:reject:)
-    func createTicket(with subject: String, desc: String, attachments: Array<String>, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    @objc(createTicket:desc:tags:attachments:resolve:reject:)
+    func createTicket(with subject: String, desc: String, tags: Array<String>, attachments: Array<String>, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
             let request = ZDKCreateRequest()
             request.subject = subject
             request.requestDescription = desc
+            request.tags = tags
             
             attachments.forEach { attachment in
                 var uploadResponse = ZDKUploadResponse()
