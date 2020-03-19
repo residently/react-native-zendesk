@@ -199,7 +199,8 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
             }
             @Override
             public void onError(ErrorResponse errorResponse) {
-                promise.reject(errorResponse.getResponseBody());
+                String errorResponseBody = errorResponse.getResponseBody();
+                promise.reject(errorResponseBody.isEmpty() ? "unknown error" : errorResponseBody);
             }
         });
     }
@@ -219,7 +220,8 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
     
                     @Override
                     public void onError(ErrorResponse errorResponse) {
-                        promise.reject(errorResponse.getResponseBody());
+                        String errorResponseBody = errorResponse.getResponseBody();
+                        promise.reject(errorResponseBody.isEmpty() ? "unknown error" : errorResponseBody);
                     }
                 });      
         } catch (URISyntaxException e) {
