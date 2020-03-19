@@ -147,6 +147,8 @@ class RNZendesk: RCTEventEmitter {
             request.requestDescription = desc
             request.tags = tags
             
+            // Need to pass upload tokens for any previously uploaded attachments
+            // (see the uploadAttachment method)
             attachments.forEach { attachment in
                 var uploadResponse = ZDKUploadResponse()
                 uploadResponse.uploadToken = attachment
@@ -184,6 +186,10 @@ class RNZendesk: RCTEventEmitter {
                 ZDKUploadProvider().uploadAttachment(attachment, withFilename: fileName, andContentType: mimeType) { (response, error) in
                     // TODO resolve and reject in a meaningful way (iOS should match android on this)
                     if let response = response {
+                        // When uploading an attachment to zendesk, we are given an
+                        // upload token in the response.
+                        // We need to pass this token when we make the request to
+                        // create a ticket
                         resolve(response.uploadToken!)
                     } else if let error = error {
                         reject("zendesk_error", error.localizedDescription, error);

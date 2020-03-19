@@ -180,6 +180,8 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
         request.setSubject(subject);
         request.setDescription(desc);
 
+        // Need to pass upload tokens for any previously uploaded attachments
+        // (see the uploadAttachment method)
         ArrayList<String> attachmentsUploaded = new ArrayList<String>();
         for (int i = 0; i < attachments.size(); i++) {
             attachmentsUploaded.add(attachments.getString(i));
@@ -214,6 +216,10 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
                 ZendeskCallback<UploadResponse>() {
                     @Override
                     public void onSuccess(UploadResponse uploadResponse) {
+                        // When uploading an attachment to zendesk, we are given an
+                        // upload token in the response.
+                        // We need to pass this token when we make the request to
+                        // create a ticket
                         promise.resolve(uploadResponse.getToken());
                     }
     
