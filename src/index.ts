@@ -64,3 +64,13 @@ export function showNewTicket(options: NewTicketOptions) {
 export function showTicketList() {
   RNZendesk.showTicketList()
 }
+
+// MARK: - Ticket Methods
+
+export function createTicket(subject: string, desc: string, tags: string[] = [], attachments: string[] = []) {
+  return RNZendesk.createTicket(subject, desc, tags, attachments)
+}
+
+export function uploadAttachment(path: string, mimeType: string, fileName: string) {
+  return RNZendesk.uploadAttachment(path, mimeType, fileName);
+}

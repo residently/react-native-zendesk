@@ -137,4 +137,70 @@ class RNZendesk: RCTEventEmitter {
             UIApplication.shared.keyWindow?.rootViewController?.present(nvc, animated: true)
         }
     }
+
+    // MARK: - Ticket Methods
+    @objc(createTicket:desc:tags:attachments:resolve:reject:)
+    func createTicket(with subject: String, desc: String, tags: Array<String>, attachments: Array<String>, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        DispatchQueue.main.async {
+            let request = ZDKCreateRequest()
+            request.subject = subject
+            request.requestDescription = desc
+            request.tags = tags
+            
+            // Need to pass upload tokens for any previously uploaded attachments
+            // (see the uploadAttachment method)
+            attachments.forEach { attachment in
+                var uploadResponse = ZDKUploadResponse()
+                uploadResponse.uploadToken = attachment
+                request.attachments.append(uploadResponse)
+            }
+
+            ZDKRequestProvider().createRequest(request) { (result, error) in
+                if result != nil {
+                    let result_object = result as AnyObject?
+                    let resp_data = result_object?.data as Data?
+                    do {
+                        let json = try (JSONSerialization.jsonObject(with: resp_data!)) as? [String:Any]
+                        let request_obj = json!["request"] as? [String:Any]
+                        resolve(request_obj!["id"])
+                    }
+                    catch {
+                        reject("zendesk_error", "Error parsing JSON response", error)
+                    }
+                } else if let error = error {
+                    reject("zendesk_error", error.localizedDescription, error);
+                } else {
+                    let unKnownError = NSError(domain: "", code: 200, userInfo: nil)
+                    reject("unknown_error", "Unexpected error", unKnownError)
+                }
+            }
+        }
+    }
+
+    @objc(uploadAttachment:mimeType:fileName:resolve:reject:)
+    func uploadAttachment(path: String, mimeType: String, fileName: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        DispatchQueue.main.async {
+            let theProfileImageUrl = URL(string: "file://" + path)
+            do {
+                let attachment = try Data(contentsOf: theProfileImageUrl!)
+                ZDKUploadProvider().uploadAttachment(attachment, withFilename: fileName, andContentType: mimeType) { (response, error) in
+                    if let response = response {
+                        // When uploading an attachment to zendesk, we are given an
+                        // upload token in the response.
+                        // We need to pass this token when we make the request to
+                        // create a ticket
+                        resolve(response.uploadToken!)
+                    } else if let error = error {
+                        reject("zendesk_error", error.localizedDescription, error);
+                    } else {
+                        let unKnownError = NSError(domain: "", code: 200, userInfo: nil)
+                        reject("unexpected_error", "Unexpected error", unKnownError)
+                    }
+                }
+            } catch {
+                print("Unable to load data: \(error)")
+                reject("unknown_error", "Unknown error", error)
+            }
+        }
+    }
 }

@@ -1,5 +1,12 @@
 package io.dcvz.rnzendesk;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.lang.Exception;
+
 import android.content.Intent;
 import android.os.Build;
 import androidx.annotation.RequiresApi;
@@ -11,6 +18,11 @@ import zendesk.core.JwtIdentity;
 import zendesk.core.AnonymousIdentity;
 import zendesk.core.PushRegistrationProvider;
 import zendesk.support.Support;
+import zendesk.support.CreateRequest;
+import zendesk.support.UploadProvider;
+import zendesk.support.UploadResponse;
+import zendesk.support.Request;
+import zendesk.support.RequestProvider;
 import zendesk.support.guide.HelpCenterActivity;
 import zendesk.support.request.RequestActivity;
 import zendesk.support.requestlist.RequestListActivity;
@@ -20,6 +32,7 @@ import com.zendesk.service.ZendeskCallback;
 
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.Promise;
@@ -156,5 +169,70 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
 
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getReactApplicationContext().startActivity(intent);
+    }
+
+    // MARK: - Ticket Methods
+    @ReactMethod
+    public void createTicket(String subject, String desc, ReadableArray tags, ReadableArray attachments, final Promise promise) {
+        final RequestProvider provider = Support.INSTANCE.provider().requestProvider();
+        final CreateRequest request = new CreateRequest();
+
+        request.setSubject(subject);
+        request.setDescription(desc);
+
+        // Need to pass upload tokens for any previously uploaded attachments
+        // (see the uploadAttachment method)
+        ArrayList<String> attachmentsUploaded = new ArrayList<String>();
+        for (int i = 0; i < attachments.size(); i++) {
+            attachmentsUploaded.add(attachments.getString(i));
+        }
+        request.setAttachments(attachmentsUploaded);
+        
+        ArrayList<String> tagsSelected = new ArrayList<String>();
+        for (int i = 0; i < tags.size(); i++) {
+            tagsSelected.add(tags.getString(i));
+        }
+        request.setTags(tagsSelected);
+
+        provider.createRequest(request, new ZendeskCallback<Request>() {
+            @Override
+            public void onSuccess(Request request) {
+                promise.resolve(request.getId());
+            }
+            @Override
+            public void onError(ErrorResponse errorResponse) {
+                String errorResponseBody = errorResponse.getResponseBody();
+                promise.reject(errorResponseBody.isEmpty() ? "unknown error" : errorResponseBody);
+            }
+        });
+    }
+
+    @ReactMethod
+    public void uploadAttachment(String path, String mimeType, String fileName, final Promise promise) {
+        try {
+            File fileToUpload = new File(new URI(path));    
+    
+            UploadProvider uploadProvider = Support.INSTANCE.provider().uploadProvider();
+            uploadProvider.uploadAttachment(fileName, fileToUpload, mimeType,  new
+                ZendeskCallback<UploadResponse>() {
+                    @Override
+                    public void onSuccess(UploadResponse uploadResponse) {
+                        // When uploading an attachment to zendesk, we are given an
+                        // upload token in the response.
+                        // We need to pass this token when we make the request to
+                        // create a ticket
+                        promise.resolve(uploadResponse.getToken());
+                    }
+    
+                    @Override
+                    public void onError(ErrorResponse errorResponse) {
+                        String errorResponseBody = errorResponse.getResponseBody();
+                        promise.reject(errorResponseBody.isEmpty() ? "unknown error" : errorResponseBody);
+                    }
+                });      
+        } catch (URISyntaxException e) {
+            promise.reject("Error uploading attachment: invalid file path");
+        }
+  
     }
 }
