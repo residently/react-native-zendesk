@@ -199,7 +199,7 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
             }
             @Override
             public void onError(ErrorResponse errorResponse) {
-                promise.reject("Ticket creation failed");
+                promise.reject(errorResponse.getResponseBody());
             }
         });
     }
@@ -219,7 +219,7 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
     
                     @Override
                     public void onError(ErrorResponse errorResponse) {
-                        promise.reject("Error uploading attachment");
+                        promise.reject(errorResponse.getResponseBody());
                     }
                 });      
         } catch (URISyntaxException e) {
