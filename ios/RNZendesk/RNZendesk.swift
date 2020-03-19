@@ -154,10 +154,17 @@ class RNZendesk: RCTEventEmitter {
             }
 
             ZDKRequestProvider().createRequest(request) { (result, error) in
-                // TODO resolve and reject in a meaningful way (iOS should match android on this)
-                // if let result = result {
                 if result != nil {
-                    resolve("Create ticket result received")
+                    let result_object = result as AnyObject?
+                    let resp_data = result_object?.data as Data?
+                    do {
+                        let json = try (JSONSerialization.jsonObject(with: resp_data!)) as? [String:Any]
+                        let request_obj = json!["request"] as? [String:Any]
+                        resolve(request_obj!["id"])
+                    }
+                    catch {
+                        reject("zendesk_error", "Error parsing JSON response", error)
+                    }
                 } else if let error = error {
                     reject("zendesk_error", error.localizedDescription, error);
                 } else {

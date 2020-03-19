@@ -194,8 +194,8 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
 
         provider.createRequest(request, new ZendeskCallback<Request>() {
             @Override
-            public void onSuccess(Request createRequest) {
-                promise.resolve("Ticket done!");
+            public void onSuccess(Request request) {
+                promise.resolve(request.getId());
             }
             @Override
             public void onError(ErrorResponse errorResponse) {
