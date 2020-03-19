@@ -184,7 +184,6 @@ class RNZendesk: RCTEventEmitter {
             do {
                 let attachment = try Data(contentsOf: theProfileImageUrl!)
                 ZDKUploadProvider().uploadAttachment(attachment, withFilename: fileName, andContentType: mimeType) { (response, error) in
-                    // TODO resolve and reject in a meaningful way (iOS should match android on this)
                     if let response = response {
                         // When uploading an attachment to zendesk, we are given an
                         // upload token in the response.
