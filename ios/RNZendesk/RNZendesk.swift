@@ -182,7 +182,6 @@ class RNZendesk: RCTEventEmitter {
             do {
                 let attachment = try Data(contentsOf: theProfileImageUrl!)
                 ZDKUploadProvider().uploadAttachment(attachment, withFilename: fileName, andContentType: mimeType) { (response, error) in
-                    // TODO resolve and reject in a meaningful way (iOS should match android on this)
                     if let response = response {
                         resolve(response.uploadToken!)
                     } else if let error = error {
