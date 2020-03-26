@@ -8,7 +8,7 @@
 
 import UIKit
 import Foundation
-import ZendeskSDK
+import SupportSDK
 import ZendeskCoreSDK
 import CommonUISDK
 
