@@ -67,6 +67,18 @@ export function showTicketList() {
 
 // MARK: - Ticket Methods
 
+interface Request {
+  id: string
+  status: string
+  subject: string
+  updatedAt: Date
+  lastComment: string
+}
+
+export function getTickets(status: string[]): Promise<Request[]> {
+  return RNZendesk.getRequests(status.join(','));
+}
+
 export function createTicket(subject: string, desc: string, tags: string[] = [], attachments: string[] = []) {
   return RNZendesk.createTicket(subject, desc, tags, attachments)
 }
