@@ -38,4 +38,5 @@ RCT_EXTERN_METHOD(createTicket:(NSString *)subject desc:(NSString *)desc tags:(N
 
 RCT_EXTERN_METHOD(uploadAttachment:(NSString *)path mimeType:(NSString *)mimeType fileName:(NSString *)file resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(getRequests:(NSString *)status resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject);
 @end
