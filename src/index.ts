@@ -71,7 +71,7 @@ interface Request {
   id: string
   status: RequestStatus
   subject: string
-  updatedAt: Date
+  updatedAt: string
   lastComment: string
 }
 

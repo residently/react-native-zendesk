@@ -218,7 +218,7 @@ class RNZendesk: RCTEventEmitter {
                             "id" : request.requestId,
                             "status" : request.status,
                             "subject" : request.subject!,
-                            "updatedAt": dateString,
+                            "updatedAt": "\(Int(request.updateAt.timeIntervalSince1970) * 1000)",
                             "lastComment": request.lastComment!.body
                         ]
                         return requestDict
