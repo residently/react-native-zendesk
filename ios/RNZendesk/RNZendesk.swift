@@ -204,4 +204,30 @@ class RNZendesk: RCTEventEmitter {
             }
         }
     }
+
+ @objc(getRequests:resolve:reject:)
+    func getRequests(status: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        DispatchQueue.main.async {
+            ZDKRequestProvider().getRequestsByStatus(status) { (result, error) in
+                if let error = error {
+                    reject("zendesk_error", error.localizedDescription, error);
+                }
+                
+                if result != nil {
+                    var requestDicts = result!.requests.map { (request: ZDKRequest) -> [String: String] in
+                        var requestDict : [String:String] = [
+                            "id" : request.requestId,
+                            "status" : request.status,
+                            "subject" : request.subject!,
+                            "updatedAt": "\(Int(request.updateAt.timeIntervalSince1970) * 1000)",
+                            "lastComment": request.lastComment!.body
+                        ]
+                        return requestDict
+                    }
+
+                    resolve(requestDicts)
+                }
+            }
+        }
+    }
 }

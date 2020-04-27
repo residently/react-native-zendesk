@@ -30,16 +30,18 @@ import zendesk.support.request.RequestUiConfig;
 import com.zendesk.service.ErrorResponse;
 import com.zendesk.service.ZendeskCallback;
 
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 
-
-import java.util.ArrayList;
 import java.util.Locale;
 
 public class RNZendeskBridge extends ReactContextBaseJavaModule {
@@ -234,5 +236,34 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
             promise.reject("Error uploading attachment: invalid file path");
         }
   
+    }
+
+    @ReactMethod
+    public void getRequests(final String statuses, final Promise promise) {
+        final RequestProvider provider = Support.INSTANCE.provider().requestProvider();
+        final WritableArray transformedRequests = new WritableNativeArray();
+
+        provider.getRequests(statuses, new ZendeskCallback<List<Request>>() {
+            @Override
+            public void onSuccess(List<Request> requests) {
+                for (Request r : requests) {
+                    WritableMap request = new WritableNativeMap();
+                    request.putString("id", r.getId());
+                    request.putString("status", r.getStatus().name().toLowerCase());
+                    request.putString("subject", r.getSubject());
+                    request.putString("lastComment", r.getLastComment().getBody());
+                    request.putString("updatedAt", Long.toString(r.getUpdatedAt().getTime()));
+
+                    transformedRequests.pushMap(request);
+                }
+                promise.resolve(transformedRequests);
+            }
+
+            @Override
+            public void onError(ErrorResponse errorResponse) {
+                String errorResponseBody = errorResponse.getResponseBody();
+                promise.reject(errorResponseBody.isEmpty() ? "unknown error" : errorResponseBody);
+            }
+        });
     }
 }
