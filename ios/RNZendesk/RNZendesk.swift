@@ -209,11 +209,12 @@ class RNZendesk: RCTEventEmitter {
     func getRequests(status: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
             ZDKRequestProvider().getRequestsByStatus(status) { (result, error) in
+                if let error = error {
+                    reject("zendesk_error", error.localizedDescription, error);
+                }
+                
                 if result != nil {
-                    let requestDicts = result!.requests.map { (request: ZDKRequest) -> [String: String] in
-                        let formatter = DateFormatter()
-                        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-                        let dateString = formatter.string(from: request.updateAt)
+                    var requestDicts = result!.requests.map { (request: ZDKRequest) -> [String: String] in
                         var requestDict : [String:String] = [
                             "id" : request.requestId,
                             "status" : request.status,
@@ -225,8 +226,6 @@ class RNZendesk: RCTEventEmitter {
                     }
 
                     resolve(requestDicts)
-                }  else if let error = error {
-                    reject("zendesk_error", error.localizedDescription, error);
                 }
             }
         }
