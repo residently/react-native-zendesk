@@ -69,15 +69,13 @@ export function showTicketList() {
 
 interface Request {
   id: string
-  status: RequestStatus
+  status: string
   subject: string
   updatedAt: string
   lastComment: string
 }
 
-type RequestStatus = 'New' | 'Open' | 'Pending' | 'Hold' | 'Solved' | 'Closed';
-
-export function getTickets(status: RequestStatus[]): Promise<Request[]> {
+export function getTickets(status: string[]): Promise<Request[]> {
   return RNZendesk.getRequests(status.join(','));
 }
 

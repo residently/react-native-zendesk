@@ -249,7 +249,7 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
                 for (Request r : requests) {
                     WritableMap request = new WritableNativeMap();
                     request.putString("id", r.getId());
-                    request.putString("status", r.getStatus().name());
+                    request.putString("status", r.getStatus().name().toLowerCase());
                     request.putString("subject", r.getSubject());
                     request.putString("lastComment", r.getLastComment().getBody());
                     request.putString("updatedAt", Long.toString(r.getUpdatedAt().getTime()));
