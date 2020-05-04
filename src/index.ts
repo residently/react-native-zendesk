@@ -79,6 +79,10 @@ export function getTickets(status: string[]): Promise<Request[]> {
   return RNZendesk.getRequests(status.join(','));
 }
 
+export function getComments(requestId: string) {
+  return RNZendesk.getComments(requestId);
+}
+
 export function createTicket(subject: string, desc: string, tags: string[] = [], attachments: string[] = []) {
   return RNZendesk.createTicket(subject, desc, tags, attachments)
 }

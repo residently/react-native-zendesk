@@ -205,7 +205,7 @@ class RNZendesk: RCTEventEmitter {
         }
     }
 
- @objc(getRequests:resolve:reject:)
+    @objc(getRequests:resolve:reject:)
     func getRequests(status: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
             ZDKRequestProvider().getRequestsByStatus(status) { (result, error) in
@@ -214,19 +214,36 @@ class RNZendesk: RCTEventEmitter {
                 }
                 
                 if result != nil {
-                    var requestDicts = result!.requests.map { (request: ZDKRequest) -> [String: String] in
-                        var requestDict : [String:String] = [
-                            "id" : request.requestId,
-                            "status" : request.status,
-                            "subject" : request.subject!,
-                            "updatedAt": "\(Int(request.updateAt.timeIntervalSince1970) * 1000)",
-                            "lastComment": request.lastComment!.body
-                        ]
+                    let requestDicts = result!.requests.map { (request: ZDKRequest) -> [String: Any] in
+                        var requestDict = Dictionary<String, Any>()
+                        requestDict["id"] = request.requestId
+                        requestDict["status"] = request.status
+                        requestDict["subject"] = request.subject!
+                        requestDict["updatedAt"] = (Int(request.updateAt.timeIntervalSince1970) * 1000)
+                        requestDict["lastComment"] = request.lastComment!.body
                         return requestDict
                     }
 
                     resolve(requestDicts)
                 }
+            }
+        }
+    }
+
+    @objc(getComments:resolve:reject:)
+    func getComments(requestId: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        DispatchQueue.main.async {
+            ZDKRequestProvider().getCommentsWithRequestId(requestId) { (result, error) in
+                let comments = result!.map { (commentWithUser: ZDKCommentWithUser) -> [String: Any] in
+                    var commentDict = Dictionary<String, Any>()
+                    let comment = commentWithUser.comment
+                    commentDict["body"] = comment!.body
+                    commentDict["authorId"] = comment!.authorId
+                    commentDict["createdAt"] = comment!.createdAt
+                    return commentDict
+                }
+                
+                resolve(comments)
             }
         }
     }
