@@ -73,6 +73,7 @@ interface Request {
   subject: string
   updatedAt: string
   lastComment: string
+  avatarUrls: string[]
 }
 
 export function getTickets(status: string[]): Promise<Request[]> {
