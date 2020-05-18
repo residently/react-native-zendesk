@@ -17,12 +17,14 @@ import zendesk.core.Identity;
 import zendesk.core.JwtIdentity;
 import zendesk.core.AnonymousIdentity;
 import zendesk.core.PushRegistrationProvider;
+import zendesk.support.Attachment;
 import zendesk.support.Support;
 import zendesk.support.CreateRequest;
 import zendesk.support.UploadProvider;
 import zendesk.support.UploadResponse;
 import zendesk.support.Request;
 import zendesk.support.RequestProvider;
+import zendesk.support.User;
 import zendesk.support.guide.HelpCenterActivity;
 import zendesk.support.request.RequestActivity;
 import zendesk.support.requestlist.RequestListActivity;
@@ -247,12 +249,20 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
             @Override
             public void onSuccess(List<Request> requests) {
                 for (Request r : requests) {
+                    List<User> commentingAgents = r.getLastCommentingAgents();
+                    WritableArray commentingAgentAvatarUrls = new WritableNativeArray();
+                    for (User user : commentingAgents) {
+                        Attachment avatar = user.getPhoto();
+                        commentingAgentAvatarUrls.pushString(avatar.getContentUrl());
+                    }
+
                     WritableMap request = new WritableNativeMap();
                     request.putString("id", r.getId());
                     request.putString("status", r.getStatus().name().toLowerCase());
                     request.putString("subject", r.getSubject());
                     request.putString("lastComment", r.getLastComment().getBody());
                     request.putString("updatedAt", Long.toString(r.getUpdatedAt().getTime()));
+                    request.putArray("avatarUrls", commentingAgentAvatarUrls);
 
                     transformedRequests.pushMap(request);
                 }
