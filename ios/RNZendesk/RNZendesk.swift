@@ -205,7 +205,7 @@ class RNZendesk: RCTEventEmitter {
         }
     }
 
- @objc(getRequests:resolve:reject:)
+    @objc(getRequests:resolve:reject:)
     func getRequests(status: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
             ZDKRequestProvider().getRequestsByStatus(status) { (result, error) in
@@ -214,13 +214,14 @@ class RNZendesk: RCTEventEmitter {
                 }
                 
                 if result != nil {
-                    var requestDicts = result!.requests.map { (request: ZDKRequest) -> [String: String] in
-                        var requestDict : [String:String] = [
+                    var requestDicts = result!.requests.map { (request: ZDKRequest) -> [String: Any] in
+                        var requestDict : [String: Any] = [
                             "id" : request.requestId,
                             "status" : request.status,
-                            "subject" : request.subject!,
+                            "subject" : request.subject ?? "",
                             "updatedAt": "\(Int(request.updateAt.timeIntervalSince1970) * 1000)",
-                            "lastComment": request.lastComment!.body
+                            "lastComment": request.lastComment!.body,
+                            "avatarUrls": ["one"]
                         ]
                         return requestDict
                     }
