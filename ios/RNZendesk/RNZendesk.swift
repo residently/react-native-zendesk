@@ -64,10 +64,10 @@ class RNZendesk: RCTEventEmitter {
     func registerWithDeviceIdentifier(deviceIdentifier: String, successCallback: @escaping RCTResponseSenderBlock, errorCallback: @escaping RCTResponseSenderBlock) {
         let locale = NSLocale.preferredLanguages.first ?? "en"
         ZDKPushProvider(zendesk: Zendesk.instance!).register(deviceIdentifier: deviceIdentifier, locale: locale) { (pushResponse, error) in
-            if(error != nil) {
-                errorCallback(["\(error)"])
+            if (error != nil) {
+                errorCallback(["\(error!)"])
             } else {
-                successCallback([pushResponse])
+                successCallback([pushResponse!])
             }
         }
     }
@@ -151,7 +151,7 @@ class RNZendesk: RCTEventEmitter {
             // Need to pass upload tokens for any previously uploaded attachments
             // (see the uploadAttachment method)
             attachments.forEach { attachment in
-                var uploadResponse = ZDKUploadResponse()
+                let uploadResponse = ZDKUploadResponse()
                 uploadResponse.uploadToken = attachment
                 request.attachments.append(uploadResponse)
             }
@@ -214,13 +214,20 @@ class RNZendesk: RCTEventEmitter {
                 }
 
                 if result != nil {
-                    var requestDicts = result!.requests.map { (request: ZDKRequest) -> [String: String] in
-                        var requestDict : [String: String] = [
+                    let requestDicts = result!.requests.map { (request: ZDKRequest) -> [String: Any] in
+                        let requestDict : [String: Any] = [
                             "id" : request.requestId,
                             "status" : request.status,
-                            "subject" : request.subject!,
+                            "subject" : request.subject ?? "",
                             "updatedAt": "\(Int(request.updateAt.timeIntervalSince1970) * 1000)",
-                            "lastComment": request.lastComment!.body
+                            "lastComment": request.lastComment!.body ?? "",
+                            "avatarUrls": request.commentingAgentsIds.map { (id: NSNumber)  in
+                                let agent = result!.commentingAgents.first { agent in
+                                    agent.userId == id
+                                }
+
+                                return agent?.avatarURL ?? ""
+                            } as [String]
                         ]
                         return requestDict
                     }
