@@ -215,13 +215,15 @@ class RNZendesk: RCTEventEmitter {
 
                 if result != nil {
                     let requestDicts = result!.requests.map { (request: ZDKRequest) -> [String: Any] in
+                        let agents = result!.commentingAgents.filter { request.commentingAgentsIds.contains($0.userId) }
+
                         let requestDict : [String: Any] = [
                             "id" : request.requestId,
                             "status" : request.status,
                             "subject" : request.subject ?? "",
                             "updatedAt": "\(Int(request.updateAt.timeIntervalSince1970) * 1000)",
                             "lastComment": request.lastComment!.body ?? "",
-                            "avatarUrls": ["one"]
+                            "avatarUrls": agents.map { $0.avatarURL }
                         ]
                         return requestDict
                     }
