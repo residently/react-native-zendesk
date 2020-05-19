@@ -137,7 +137,7 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getReactApplicationContext().startActivity(intent);
     }
-    
+
     @ReactMethod
     public void showTicket(String requestId) {
         final Intent intent = new RequestUiConfig.Builder()
@@ -191,7 +191,7 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
             attachmentsUploaded.add(attachments.getString(i));
         }
         request.setAttachments(attachmentsUploaded);
-        
+
         ArrayList<String> tagsSelected = new ArrayList<String>();
         for (int i = 0; i < tags.size(); i++) {
             tagsSelected.add(tags.getString(i));
@@ -214,8 +214,8 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
     @ReactMethod
     public void uploadAttachment(String path, String mimeType, String fileName, final Promise promise) {
         try {
-            File fileToUpload = new File(new URI(path));    
-    
+            File fileToUpload = new File(new URI(path));
+
             UploadProvider uploadProvider = Support.INSTANCE.provider().uploadProvider();
             uploadProvider.uploadAttachment(fileName, fileToUpload, mimeType,  new
                 ZendeskCallback<UploadResponse>() {
@@ -227,17 +227,17 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
                         // create a ticket
                         promise.resolve(uploadResponse.getToken());
                     }
-    
+
                     @Override
                     public void onError(ErrorResponse errorResponse) {
                         String errorResponseBody = errorResponse.getResponseBody();
                         promise.reject(errorResponseBody.isEmpty() ? "unknown error" : errorResponseBody);
                     }
-                });      
+                });
         } catch (URISyntaxException e) {
             promise.reject("Error uploading attachment: invalid file path");
         }
-  
+
     }
 
     @ReactMethod
@@ -253,7 +253,10 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
                     WritableArray commentingAgentAvatarUrls = new WritableNativeArray();
                     for (User user : commentingAgents) {
                         Attachment avatar = user.getPhoto();
-                        commentingAgentAvatarUrls.pushString(avatar.getContentUrl());
+
+                        if (avatar != null) {
+                            commentingAgentAvatarUrls.pushString(avatar.getContentUrl());
+                        }
                     }
 
                     WritableMap request = new WritableNativeMap();
