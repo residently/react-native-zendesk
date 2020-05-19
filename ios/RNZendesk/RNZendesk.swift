@@ -18,18 +18,18 @@ class RNZendesk: RCTEventEmitter {
     override public static func requiresMainQueueSetup() -> Bool {
         return false;
     }
-    
+
     @objc(constantsToExport)
     override func constantsToExport() -> [AnyHashable: Any] {
         return [:]
     }
-    
+
     @objc(supportedEvents)
     override func supportedEvents() -> [String] {
         return []
     }
-    
-    
+
+
     // MARK: - Initialization
 
     @objc(initialize:)
@@ -38,26 +38,26 @@ class RNZendesk: RCTEventEmitter {
             let appId = config["appId"] as? String,
             let clientId = config["clientId"] as? String,
             let zendeskUrl = config["zendeskUrl"] as? String else { return }
-        
+
         Zendesk.initialize(appId: appId, clientId: clientId, zendeskUrl: zendeskUrl)
         Support.initialize(withZendesk: Zendesk.instance)
     }
-    
+
     // MARK: - Indentification
-    
+
     @objc(identifyJWT:)
     func identifyJWT(token: String?) {
         guard let token = token else { return }
         let identity = Identity.createJwt(token: token)
         Zendesk.instance?.setIdentity(identity)
     }
-    
+
     @objc(identifyAnonymous:email:)
     func identifyAnonymous(name: String?, email: String?) {
         let identity = Identity.createAnonymous(name: name, email: email)
         Zendesk.instance?.setIdentity(identity)
     }
-    
+
     // MARK: - Notifications
 
     @objc(registerWithDeviceIdentifier:successCallback:errorCallback:)
@@ -70,7 +70,7 @@ class RNZendesk: RCTEventEmitter {
                 successCallback([pushResponse])
             }
         }
-    }    
+    }
 
     @objc(unregisterDevice)
     func unregisterDevice() {
@@ -78,7 +78,7 @@ class RNZendesk: RCTEventEmitter {
     }
 
     // MARK: - UI Methods
-    
+
     @objc(showHelpCenter:)
     func showHelpCenter(with options: [String: Any]) {
         DispatchQueue.main.async {
@@ -86,12 +86,12 @@ class RNZendesk: RCTEventEmitter {
             let hideContactSupport = (options["hideContactSupport"] as? Bool) ?? false
             hcConfig.showContactOptions = !hideContactSupport
             let helpCenter = HelpCenterUi.buildHelpCenterOverviewUi(withConfigs: [hcConfig])
-            
+
             let nvc = UINavigationController(rootViewController: helpCenter)
             UIApplication.shared.keyWindow?.rootViewController?.present(nvc, animated: true, completion: nil)
         }
     }
-    
+
     @objc(showNewTicket:)
     func showNewTicket(with options: [String: Any]) {
         DispatchQueue.main.async {
@@ -100,14 +100,14 @@ class RNZendesk: RCTEventEmitter {
                 config.tags = tags
             }
             let requestScreen = RequestUi.buildRequestUi(with: [config])
-            
+
             let nvc = UINavigationController(rootViewController: requestScreen)
             UIApplication.shared.keyWindow?.rootViewController?.present(nvc, animated: true, completion: nil)
         }
     }
 
     @objc(showTicket:)
-    func showTicket(with requestId: String) {        
+    func showTicket(with requestId: String) {
         DispatchQueue.main.async {
             let requestScreen = RequestUi.buildRequestUi(requestId: requestId)
             let nvc = UINavigationController(rootViewController: requestScreen)
@@ -133,7 +133,7 @@ class RNZendesk: RCTEventEmitter {
     func showTicketList() {
         DispatchQueue.main.async {
             let requestListController = RequestUi.buildRequestList()
-            
+
             let nvc = UINavigationController(rootViewController: requestListController)
             UIApplication.shared.keyWindow?.rootViewController?.present(nvc, animated: true)
         }
@@ -147,7 +147,7 @@ class RNZendesk: RCTEventEmitter {
             request.subject = subject
             request.requestDescription = desc
             request.tags = tags
-            
+
             // Need to pass upload tokens for any previously uploaded attachments
             // (see the uploadAttachment method)
             attachments.forEach { attachment in
@@ -205,17 +205,17 @@ class RNZendesk: RCTEventEmitter {
         }
     }
 
- @objc(getRequests:resolve:reject:)
+    @objc(getRequests:resolve:reject:)
     func getRequests(status: String, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         DispatchQueue.main.async {
             ZDKRequestProvider().getRequestsByStatus(status) { (result, error) in
                 if let error = error {
                     reject("zendesk_error", error.localizedDescription, error);
                 }
-                
+
                 if result != nil {
                     var requestDicts = result!.requests.map { (request: ZDKRequest) -> [String: String] in
-                        var requestDict : [String:String] = [
+                        var requestDict : [String: String] = [
                             "id" : request.requestId,
                             "status" : request.status,
                             "subject" : request.subject!,
