@@ -92,15 +92,24 @@ class RNZendesk: RCTEventEmitter {
         }
     }
 
-    @objc(showNewTicket:)
+@objc(showNewTicket:)
     func showNewTicket(with options: [String: Any]) {
         DispatchQueue.main.async {
             let config = RequestUiConfiguration()
             if let tags = options["tags"] as? [String] {
                 config.tags = tags
             }
+            if let subject = options["subject"] as? String {
+                config.subject = subject
+            }
+            let customFields = options["customFields"] as! NSDictionary
+            var cfs:[CustomField] = []
+            for (key, value) in customFields {
+                let cf = CustomField(fieldId: key as? Int64 ?? 0 , value: value )
+                cfs.append(cf)
+            }
+            config.customFields = cfs
             let requestScreen = RequestUi.buildRequestUi(with: [config])
-
             let nvc = UINavigationController(rootViewController: requestScreen)
             UIApplication.shared.keyWindow?.rootViewController?.present(nvc, animated: true, completion: nil)
         }
