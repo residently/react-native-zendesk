@@ -252,10 +252,12 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
                     List<User> commentingAgents = r.getLastCommentingAgents();
                     WritableArray commentingAgentAvatarUrls = new WritableNativeArray();
                     for (User user : commentingAgents) {
-                        Attachment avatar = user.getPhoto();
+                        if (user != null) {
+                            Attachment avatar = user.getPhoto();
 
-                        if (avatar != null) {
-                            commentingAgentAvatarUrls.pushString(avatar.getContentUrl());
+                            if (avatar != null) {
+                                commentingAgentAvatarUrls.pushString(avatar.getContentUrl());
+                            }
                         }
                     }
 
