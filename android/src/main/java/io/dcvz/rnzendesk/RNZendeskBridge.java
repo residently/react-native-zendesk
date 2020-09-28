@@ -28,7 +28,6 @@ import zendesk.support.User;
 import zendesk.support.guide.HelpCenterActivity;
 import zendesk.support.request.RequestActivity;
 import zendesk.support.requestlist.RequestListActivity;
-import zendesk.support.request.RequestUiConfig;
 import com.zendesk.service.ErrorResponse;
 import com.zendesk.service.ZendeskCallback;
 
@@ -140,9 +139,9 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void showTicket(String requestId) {
-        final Intent intent = new RequestUiConfig.Builder()
-            .withRequestId(requestId)
-            .intent(getReactApplicationContext());
+        final Intent intent = RequestActivity.builder()
+                .withRequestId(requestId)
+                .intent(getReactApplicationContext());
 
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getReactApplicationContext().startActivity(intent);
