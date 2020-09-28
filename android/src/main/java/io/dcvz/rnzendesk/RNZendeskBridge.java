@@ -11,7 +11,7 @@ import android.content.Intent;
 import android.os.Build;
 import androidx.annotation.RequiresApi;
 
-import zendesk.commonui.UiConfig;
+import zendesk.configurations.Configuration;
 import zendesk.core.Zendesk;
 import zendesk.core.Identity;
 import zendesk.core.JwtIdentity;
@@ -125,7 +125,7 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
     @ReactMethod
     public void showHelpCenter(ReadableMap options) {
 //        Boolean hideContact = options.getBoolean("hideContactUs") || false;
-        UiConfig hcConfig = HelpCenterActivity.builder()
+        Configuration hcConfig = HelpCenterActivity.builder()
                 .withContactUsButtonVisible(!(options.hasKey("hideContactSupport") && options.getBoolean("hideContactSupport")))
                 .config();
 
